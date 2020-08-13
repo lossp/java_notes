@@ -8,11 +8,138 @@ Annotation, frankly speaking, is an interface which extends `Annotation`. When w
 
 #### How customized annotation works?
 
-#### the @Target
+##### RetentionPolicy
 
-#### the @Retention
+the customized annotion shows as below
 
+```java
+import java.lang.annotation.*;
 
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Check {
+	String value();
+}
+```
+
+defines a class with Check annotation
+
+```java
+@Check(value = "tell")
+public class Test {
+
+}
+```
+
+use `javap -verbose Test` to check the Test.class file, here is what came out
+
+```shell
+Constant pool:
+   #1 = Methodref          #3.#14         // java/lang/Object."<init>":()V
+   #2 = Class              #15            // Test
+   #3 = Class              #16            // java/lang/Object
+   #4 = Utf8               <init>
+   #5 = Utf8               ()V
+   #6 = Utf8               Code
+   #7 = Utf8               LineNumberTable
+   #8 = Utf8               SourceFile
+   #9 = Utf8               Test.java
+  #10 = Utf8               RuntimeVisibleAnnotations
+```
+
+check the Constant pool, and we can see the 10th param, `RuntimeVisibleAnnotations`. this param is defined in the `Check` by `RetentionPolicy.RUNTIME`. It not only can be detected during the runtime, but also remained in the class file.
+
+When we change the RetentionPolicy into CLASS, as below
+
+```java
+import java.lang.annotation.*;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.CLASS)
+public @interface Check {
+	String value();
+}
+```
+
+then check the Test.class
+
+```shell
+Constant pool:
+   #1 = Methodref          #3.#14         // java/lang/Object."<init>":()V
+   #2 = Class              #15            // Test
+   #3 = Class              #16            // java/lang/Object
+   #4 = Utf8               <init>
+   #5 = Utf8               ()V
+   #6 = Utf8               Code
+   #7 = Utf8               LineNumberTable
+   #8 = Utf8               SourceFile
+   #9 = Utf8               Test.java
+  #10 = Utf8               RuntimeInvisibleAnnotations
+```
+
+Now the 10th param show `RuntimeInvisibleAnnotations`, which means the annotation cannot be detected during the run time of java. And it only be remained in the class file.
+
+When it comes to SOURCE
+
+```java
+import java.lang.annotation.*;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.SOURCE)
+public @interface Check {
+	String value();
+}
+```
+
+the Test.class shows
+
+```shell
+Constant pool:
+   #1 = Methodref          #3.#10         // java/lang/Object."<init>":()V
+   #2 = Class              #11            // Test
+   #3 = Class              #12            // java/lang/Object
+   #4 = Utf8               <init>
+   #5 = Utf8               ()V
+   #6 = Utf8               Code
+   #7 = Utf8               LineNumberTable
+   #8 = Utf8               SourceFile
+   #9 = Utf8               Test.java
+  #10 = NameAndType        #4:#5          // "<init>":()V
+  #11 = Utf8               Test
+  #12 = Utf8               java/lang/Object
+```
+
+which means the annotation only be contained in the .java file, it will not compile into the class file, not to say its existence during the run time of java.
+
+when take the Check annotion out of Test class, as below
+
+```java
+public class Test {
+
+}
+```
+
+the .class file shows
+
+```shell
+Constant pool:
+   #1 = Methodref          #3.#10         // java/lang/Object."<init>":()V
+   #2 = Class              #11            // Test
+   #3 = Class              #12            // java/lang/Object
+   #4 = Utf8               <init>
+   #5 = Utf8               ()V
+   #6 = Utf8               Code
+   #7 = Utf8               LineNumberTable
+   #8 = Utf8               SourceFile
+   #9 = Utf8               Test.java
+  #10 = NameAndType        #4:#5          // "<init>":()V
+  #11 = Utf8               Test
+  #12 = Utf8               java/lang/Object
+```
+
+it`s exactly the same as SOURCE circumstance.
+
+##### Target
 
 
 
