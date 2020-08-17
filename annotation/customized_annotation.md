@@ -47,7 +47,7 @@ Constant pool:
   #10 = Utf8               RuntimeVisibleAnnotations
 ```
 
-check the Constant pool, and we can see the 10th param, `RuntimeVisibleAnnotations`. this param is defined in the `Check` by `RetentionPolicy.RUNTIME`. It not only can be detected during the runtime, but also remained in the class file.
+check the Constant pool, and we can see the 10th param, `RuntimeVisibleAnnotations`. this param is defined in the `Check` by `RetentionPolicy.RUNTIME`. It not only can be detected during the runtime, but also remained in the class file. By the means of java.lang.Reflect, we can get the specific annotation.
 
 When we change the RetentionPolicy into CLASS, as below
 
@@ -140,6 +140,63 @@ Constant pool:
 it`s exactly the same as SOURCE circumstance.
 
 ##### Target
+
+Target annotation is a meta annotation, which indicates the context in which an annotation type is applicable.
+
+It can be used in scenario like below(all scenario are represented in ElementType.class):
+
+```java
+public enum ElementType {
+    /** Class, interface (including annotation type), or enum declaration */
+    TYPE,
+
+    /** Field declaration (includes enum constants) */
+    FIELD,
+
+    /** Method declaration */
+    METHOD,
+
+    /** Formal parameter declaration */
+    PARAMETER,
+
+    /** Constructor declaration */
+    CONSTRUCTOR,
+
+    /** Local variable declaration */
+    LOCAL_VARIABLE,
+
+    /** Annotation type declaration */
+    ANNOTATION_TYPE,
+
+    /** Package declaration */
+    PACKAGE,
+
+    /**
+     * Type parameter declaration
+     *
+     * @since 1.8
+     */
+    TYPE_PARAMETER,
+
+    /**
+     * Use of a type
+     *
+     * @since 1.8
+     */
+    TYPE_USE,
+
+    /**
+     * Module declaration.
+     *
+     * @since 9
+     */
+    MODULE
+}
+```
+
+@Target is more like a mark that marks the spot inside a class. In that way, we can get the class targeted field or method, which is the fundation of annotaion application.
+
+The whole Spring economy is based on annotations. No shit..
 
 
 
